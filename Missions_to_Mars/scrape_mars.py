@@ -1,14 +1,13 @@
-
 import time
 import pandas as pd
 import requests as req
 from bs4 import BeautifulSoup as bs
 from splinter import Browser
 
-
 def init_browser():
     executable_path = {"executable_path": "/usr/local/bin/chromedriver"}
-    return Browser("chrome", **executable_path, headless=False)
+    browser= Browser("chrome", **executable_path, headless=False) 
+    return browser
 
 
 def scrape():
@@ -42,22 +41,17 @@ def scrape():
     featured_image_url = f'https://www.jpl.nasa.gov{feat_img_url}'
 
    
-    tweet_url = "https://twitter.com/marswxreport?lang=en"
-    browser.visit(tweet_url)
-    html = browser.html
+    url_weather = 'https://twitter.com/marswxreport?lang=en'
 
-    soup = bs(html, 'html.parser')
+    response_weather = req.get(url_weather)
 
-    tweet_container = soup.find_all('div', class_="js-tweet-text-container")
+    soup_weather = bs(response_weather.text, 'lxml')
+    soup_weather.find('div', class_='css-901oao r-hkyrab r-1qd0xha r-a023e6 r-16dba41 r-ad9z0x r-bcqeeo r-bnwqim r-qvutc0')
 
 
-    for tweet in tweet_container: 
-        mars_weather = tweet.find('p').text
-        if 'sol' in mars_weather:
-            
-            break
-        else: 
-            pass
+    weather_tweet = soup_weather.find('p', class_='TweetTextSize TweetTextSize--normal js-tweet-text tweet-text').text.strip()
+
+    print(weather_tweet)
     
 
     facts_url = "https://space-facts.com/mars/"
@@ -116,6 +110,6 @@ def scrape():
 
    
     return mars_data
-
+scrape()
 if __name__ == '__main__':
     scrape()
